@@ -1,0 +1,39 @@
+{
+  "name": "DCF 계산기",
+  "short_name": "DCF계산기",
+  "description": "5개년 DCF(현금흐름할인법) 계산기 - 1년차 매출, 5년 기하평균 성장률, FCF 마진율, 영구성장률, WACC으로 기업가치를 계산합니다.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#12151A",
+  "theme_color": "#12151A",
+  "lang": "ko",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-192-maskable.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
