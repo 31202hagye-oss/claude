@@ -4,7 +4,14 @@ All numbers in the workbook are live Excel formulas driven by the Parameters she
 so changing any input (e.g. rf) updates every table and chart.
 
     python3 hw1/build_hw1_workbook.py
+
+If LibreOffice is installed, the file is recalculated and re-saved through it so the
+workbook also stores computed values; viewers that do not recalculate (phone/app
+previews) can then display the numbers and charts.
 """
+import shutil
+import subprocess
+import tempfile
 from pathlib import Path
 
 from openpyxl import Workbook
@@ -229,8 +236,8 @@ def make_chart(title, xtitle, ytitle, xmax, ymin=0.0, ymax=0.22):
     ch.x_axis.delete = False
     ch.y_axis.delete = False
     ch.x_axis.majorGridlines = None
-    ch.height = 11
-    ch.width = 18
+    ch.height = 13
+    ch.width = 24
     ch.legend.position = "b"
     return ch
 
@@ -286,7 +293,7 @@ def build_charts(wb, ws, last_w, last_sd, last_var, last_mu):
     ch2.series.append(line_series(ws, 13, 15, 3, last_var, "With rf: rf − SR·√σ²",
                                   "ED7D31", dash="dash"))
     add_points(ch2, ws, 25)
-    cs.add_chart(ch2, "L4")
+    cs.add_chart(ch2, "A31")
 
     # 3. Ray vs tangent in mean-variance space
     ch3 = make_chart("Ray rf→p vs tangent at p (mean–variance space)", "Variance σ²",
@@ -299,7 +306,7 @@ def build_charts(wb, ws, last_w, last_sd, last_var, last_mu):
                                   "Tangent at p (slope (μp−rf)/(2σp²))", "00B050",
                                   dash="sysDot", width=15000))
     add_points(ch3, ws, 25)
-    cs.add_chart(ch3, "A28")
+    cs.add_chart(ch3, "A58")
 
 
 def build_slopes(wb):
@@ -347,7 +354,19 @@ def main():
     build_slopes(wb)
     wb.move_sheet("Charts", offset=-2)
     wb.save(OUT)
+    embed_cached_values(OUT)
     print(f"wrote {OUT}")
+
+
+def embed_cached_values(path):
+    soffice = shutil.which("soffice") or shutil.which("libreoffice")
+    if not soffice:
+        print("LibreOffice not found: saved formulas only (Excel recalculates on open)")
+        return
+    with tempfile.TemporaryDirectory() as tmp:
+        subprocess.run([soffice, "--headless", "--convert-to", "xlsx:Calc MS Excel 2007 XML",
+                        "--outdir", tmp, str(path)], check=True, capture_output=True)
+        shutil.move(Path(tmp) / path.name, path)
 
 
 if __name__ == "__main__":
