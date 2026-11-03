@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dcf-calculator-v2';
+const CACHE_NAME = 'dcf-calculator-v3';
 const SCOPE_URL = new URL(self.registration.scope);
 const PRECACHE_URLS = [
   SCOPE_URL.pathname,
