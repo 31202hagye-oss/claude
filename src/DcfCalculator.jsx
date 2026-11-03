@@ -3,14 +3,15 @@ import { Save, FolderOpen, Trash2, X, AlertTriangle, RotateCcw } from 'lucide-re
 
 const DEFAULTS = {
   year1Revenue: 1000,
-  growthRate: 10,
+  growthRate1: 30,
+  growthRate2: 20,
   fcfMargin: 20,
-  terminalGrowth: 2.5,
+  terminalGrowth: 3,
   wacc: 10,
 };
 
-const CURRENT_KEY = 'dcf5:current';
-const SCENARIO_PREFIX = 'dcf5:scenario:';
+const CURRENT_KEY = 'dcf10:current';
+const SCENARIO_PREFIX = 'dcf10:scenario:';
 
 function n(v) {
   const x = Number(v);
@@ -155,15 +156,19 @@ export default function DcfCalculator() {
 
   const calc = useMemo(() => {
     const year1Revenue = n(inputs.year1Revenue);
-    const growthRate = n(inputs.growthRate) / 100;
+    const growthRate1 = n(inputs.growthRate1) / 100;
+    const growthRate2 = n(inputs.growthRate2) / 100;
     const fcfMargin = n(inputs.fcfMargin) / 100;
     const wacc = n(inputs.wacc) / 100;
     const tg = n(inputs.terminalGrowth) / 100;
 
+    const HORIZON = 10;
+    const PHASE1_END = 5; // 1~5년차: growthRate1 적용
+
     const rows = [];
     let revenue = year1Revenue;
-    for (let i = 1; i <= 5; i++) {
-      if (i > 1) revenue = revenue * (1 + growthRate);
+    for (let i = 1; i <= HORIZON; i++) {
+      if (i > 1) revenue = revenue * (1 + (i <= PHASE1_END ? growthRate1 : growthRate2));
       const fcf = revenue * fcfMargin;
       const discount = Math.pow(1 + wacc, i);
       const pv = fcf / discount;
@@ -174,9 +179,9 @@ export default function DcfCalculator() {
     const valid = wacc > tg;
     let pvTV = null, totalValue = null;
     if (valid) {
-      const lastFCF = rows[4].fcf;
+      const lastFCF = rows[HORIZON - 1].fcf;
       const TV = (lastFCF * (1 + tg)) / (wacc - tg);
-      pvTV = TV / Math.pow(1 + wacc, 5);
+      pvTV = TV / Math.pow(1 + wacc, HORIZON);
       totalValue = sumPV + pvTV;
     }
     return { rows, sumPV, pvTV, totalValue, valid };
@@ -238,7 +243,7 @@ export default function DcfCalculator() {
       `}</style>
 
       <div className="dcf-header-top">
-        <span className="dcf-title">5개년 DCF 계산기</span>
+        <span className="dcf-title">10개년 DCF 계산기</span>
         {toast ? <span className="dcf-toast">{toast}</span> : null}
       </div>
       <div className="dcf-header-row">
@@ -281,13 +286,14 @@ export default function DcfCalculator() {
 
       <div className="dcf-card">
         <NumField label="1년차 매출" value={inputs.year1Revenue} onChange={(v) => updateInput('year1Revenue', v)} step={1} />
-        <NumField label="5년 기하평균 성장률" value={inputs.growthRate} onChange={(v) => updateInput('growthRate', v)} suffix="%" step={0.5} />
+        <NumField label="성장률1 (1~5년차)" value={inputs.growthRate1} onChange={(v) => updateInput('growthRate1', v)} suffix="%" step={0.5} />
+        <NumField label="성장률2 (6~10년차)" value={inputs.growthRate2} onChange={(v) => updateInput('growthRate2', v)} suffix="%" step={0.5} />
         <NumField label="FCF 마진율" value={inputs.fcfMargin} onChange={(v) => updateInput('fcfMargin', v)} suffix="%" step={0.5} />
         <NumField label="영구성장률" value={inputs.terminalGrowth} onChange={(v) => updateInput('terminalGrowth', v)} suffix="%" step={0.25} />
         <NumField label="WACC" value={inputs.wacc} onChange={(v) => updateInput('wacc', v)} suffix="%" step={0.25} />
       </div>
 
-      <div className="dcf-block-title">5개년 추정</div>
+      <div className="dcf-block-title">10개년 추정</div>
       <div className="dcf-table-wrap">
         <table className="dcf-table">
           <thead>

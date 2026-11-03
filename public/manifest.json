@@ -1,7 +1,7 @@
 {
   "name": "DCF 계산기",
   "short_name": "DCF계산기",
-  "description": "5개년 DCF(현금흐름할인법) 계산기 - 1년차 매출, 5년 기하평균 성장률, FCF 마진율, 영구성장률, WACC으로 기업가치를 계산합니다.",
+  "description": "10개년 DCF(현금흐름할인법) 계산기 - 1년차 매출, 성장률1(1~5년차), 성장률2(6~10년차), FCF 마진율, 영구성장률, WACC으로 기업가치를 계산합니다.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
